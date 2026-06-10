@@ -1,0 +1,41 @@
+private static void saveToJSONFile() {
+String jsonFilePath = "messages.json";
+StringBuilder jsonBuilder = new StringBuilder();
+
+jsonBuilder.append("[\n");
+for (int index = 0; index < messageList.size(); index++) {
+Message currentMessage = messageList.get(index);
+
+jsonBuilder.append(" {\n");
+jsonBuilder.append(" \"messageID\": \"").append(escapeString(currentMessage.messageID)).append("\",\n");
+jsonBuilder.append(" \"messageHash\": \"").append(escapeString(currentMessage.messageHash)).append("\",\n");
+jsonBuilder.append(" \"recipient\": \"").append(escapeString(currentMessage.recipient)).append("\",\n");
+jsonBuilder.append(" \"content\": \"").append(escapeString(currentMessage.content)).append("\"\n");
+
+if (index < messageList.size() - 1) {
+jsonBuilder.append(" },\n");
+} else {
+jsonBuilder.append(" }\n");
+}
+}
+jsonBuilder.append("]");
+
+try (FileWriter diskWriter = new FileWriter(jsonFilePath)) {
+diskWriter.write(jsonBuilder.toString());
+diskWriter.flush();
+System.out.println("Console Logs Notification Engine: Successfully synchronized persistence records inside messages.json target mapping coordinates.");
+} catch (IOException fileWriteException) {
+JOptionPane.showMessageDialog(null, "Persistence Error Event: Critical pipeline failure tracking disk operations write vector commands tasks.", "File Storage System Error", JOptionPane.ERROR_MESSAGE);
+fileWriteException.printStackTrace();
+}
+}
+
+private static String escapeString(String inputSourceText) {
+if (inputSourceText == null) return "";
+return inputSourceText.replace("\\", "\\\\")
+.replace("\"", "\\\"")
+.replace("\n", "\\n")
+.replace("\r", "\\r")
+.replace("\t", "\\t");
+}
+}
