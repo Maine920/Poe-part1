@@ -1,0 +1,27 @@
+private static ArrayList<Message> messageList = new ArrayList<>();
+    private static int totalMessagesSent = 0;
+
+// Stores the  registration variables for validation during login
+    private static String registeredUser = "";
+    private static String registeredPass = "";
+
+    public static void main(String[] args) {
+        runRegistrationWorkflow();
+
+//  Login only if Registration is correct
+        boolean loginSuccess = runLoginWorkflow();
+
+        if (!loginSuccess) {
+            JOptionPane.showMessageDialog(null, "Access Denied. Invalid credentials.", "System Exit", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+
+//  Welcome Message outputted after Successful check
+        JOptionPane.showMessageDialog(null, "Welcome to QuickChat.", "QuickChat Welcome", JOptionPane.INFORMATION_MESSAGE);
+
+        boolean running = true;
+        while (running) {
+            String menu = "Please choose one of the following features from the numeric menu:\n"
+                    + "1) Send Messages\n"
+                    + "2) Show recently sent messages\n"
+                    + "3) Quit";
