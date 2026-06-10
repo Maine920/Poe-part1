@@ -1,0 +1,14 @@
+JOptionPane.showMessageDialog(null, "Total messages sent: " + totalMessagesSent, "Task Summary Reports", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+ 
+        private static String generateHash(String id, int loopCounter, String content) {
+        String cleanID = id.substring(0, 2);
+
+        String[] splitWords = content.trim().split("\\s+");
+        String firstWord = splitWords[0];
+        String lastWord = splitWords[splitWords.length - 1];
+
+        String generatedRaw = cleanID + ":" + loopCounter + ":" + firstWord + lastWord;
+
+        return generatedRaw.toUpperCase();
