@@ -1,0 +1,15 @@
+class Message {
+String messageID;
+String messageHash;
+String recipient;
+String content;
+String status; 
+
+public Message(String id, String hash, String recipient, String content, String status) {
+this.messageID = id;
+this.messageHash = hash;
+this.recipient = recipient;
+this.content = content;
+this.status = status;
+}
+}
