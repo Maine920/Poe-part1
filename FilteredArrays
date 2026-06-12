@@ -1,0 +1,9 @@
+private static String[] getFilteredArrayByStatus(String stateCriteria) {
+ArrayList<String> matchesCollection = new ArrayList<>();
+for (Message msg : masterMessageList) {
+if (msg.status.equalsIgnoreCase(stateCriteria)) {
+matchesCollection.add(msg.content);
+}
+}
+return matchesCollection.toArray(new String[0]);
+}
