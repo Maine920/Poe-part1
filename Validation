@@ -1,0 +1,74 @@
+private static void runRegistrationWorkflow() {
+System.out.println("Welcome! ");
+System.out.println("System Sign Up");
+
+System.out.print("Enter First Name: ");
+String firstName = scanner.nextLine();
+
+System.out.print("Enter Last Name: ");
+String lastName = scanner.nextLine();
+
+System.out.print("Create account username: ");
+registeredUser = scanner.nextLine();
+
+System.out.print("Create account password: ");
+registeredPass = scanner.nextLine();
+
+System.out.println("[Successful Registration ] Welcome " + firstName + " " + lastName + "!");
+}
+
+private static boolean runLoginWorkflow() {
+System.out.println(" Account Authorization");
+
+System.out.print("Enter username: ");
+String userAttempt = scanner.nextLine();
+
+System.out.print("Enter password: ");
+String passAttempt = scanner.nextLine();
+
+return userAttempt.equals(registeredUser) && passAttempt.equals(registeredPass);
+}
+
+private static void sendMessagesWorkflow() {
+System.out.print("\nHow many total messages do you wish to enter? ");
+String numInput = scanner.nextLine();
+
+int numMessages;
+try {
+numMessages = Integer.parseInt(numInput.trim());
+} catch (NumberFormatException e) {
+System.out.println("\n[PARSING VALUE ERROR] Invalid integer parameter entered. Aborting pipeline.");
+return;
+}
+
+for (int i = 0; i < numMessages; i++) {
+System.out.println(String.format("\n--- Message Loop %d of %d ---", (i + 1), numMessages));
+
+// Recipient validation
+
+String recipient = "";
+while (true) {
+System.out.print("Enter recipient mobile number (international dialing codes): ");
+recipient = scanner.nextLine();
+
+if (recipient.trim().length() >= 10) {
+break;
+}
+System.out.println("[FORMAT DATA FAULT] Format verification failure. Full international digits required.");
+}
+
+//  Message Length Validation 
+String content = "";
+while (true) {
+System.out.print("Enter short descriptive message (Strict 250 character cap limit): ");
+content = scanner.nextLine();
+
+if (content.trim().isEmpty()) {
+System.out.println("[VALIDATION ERROR] Message text cannot be empty.");
+} else if (content.length() <= 250) {
+System.out.println("Message text verified.");
+break;
+} else {
+System.out.println("[TEXT FIELD SIZE VIOLATION] Please enter a message of less than 250 characters.");
+}
+}
