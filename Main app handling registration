@@ -1,0 +1,50 @@
+public class ChatApplication3 {
+
+// Master operational list to dynamically capture data objects
+private static final ArrayList<Message> masterMessageList = new ArrayList<>();
+private static int totalMessagesSent = 0;
+
+private static String registeredUser = "";
+private static String registeredPass = "";
+
+// Single Scanner instance shared across methods
+private static final Scanner scanner = new Scanner(System.in);
+
+public static void main(String[] args) {
+// User Registration
+runRegistrationWorkflow();
+
+// User  Login
+boolean loginSuccess = runLoginWorkflow();
+if (!loginSuccess) {
+System.out.println("\n[SECURITY NOTICE] Access Denied.");
+return;
+}
+
+System.out.println(" Welcome to QuickChat ");
+
+boolean running = true;
+while (running) {
+System.out.println("\nPlease choose one of the following features from the numeric menu:");
+System.out.println("1) Send Messages");
+System.out.println("2) Show recently sent messages");
+System.out.println("3) Stored Messages Menu Options (Part 3)");
+System.out.println("4) Quit");
+System.out.print("Selection: ");
+
+String choice = scanner.nextLine().trim();
+
+if (choice.equals("4")) {
+running = false;
+System.out.println("\nQuitting application safely...");
+} else if (choice.equals("1")) {
+sendMessagesWorkflow();
+} else if (choice.equals("2")) {
+showRecentlySentMessages();
+} else if (choice.equals("3")) {
+runStoredMessagesSubMenu();
+} else {
+System.out.println("\n[INPUT FAULT ERROR] Invalid selection. Choose 1, 2, 3, or 4.");
+}
+}
+}
