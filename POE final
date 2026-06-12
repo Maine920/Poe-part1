@@ -1,0 +1,408 @@
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.Scanner;
+
+//Class representing the core attributes of a chat message instance.
+
+class Message {
+String messageID;
+String messageHash;
+String recipient;
+String content;
+String status; 
+
+public Message(String id, String hash, String recipient, String content, String status) {
+this.messageID = id;
+this.messageHash = hash;
+this.recipient = recipient;
+this.content = content;
+this.status = status;
+}
+}
+
+
+ //Main application that handles registration and authentication
+ 
+public class ChatApplication3 {
+
+// Master operational list to dynamically capture data objects
+private static final ArrayList<Message> masterMessageList = new ArrayList<>();
+private static int totalMessagesSent = 0;
+
+private static String registeredUser = "";
+private static String registeredPass = "";
+
+// Single Scanner instance shared across methods
+private static final Scanner scanner = new Scanner(System.in);
+
+public static void main(String[] args) {
+// User Registration
+runRegistrationWorkflow();
+
+// User  Login
+boolean loginSuccess = runLoginWorkflow();
+if (!loginSuccess) {
+System.out.println("\n[SECURITY NOTICE] Access Denied.");
+return;
+}
+
+System.out.println(" Welcome to QuickChat ");
+
+boolean running = true;
+while (running) {
+System.out.println("\nPlease choose one of the following features from the numeric menu:");
+System.out.println("1) Send Messages");
+System.out.println("2) Show recently sent messages");
+System.out.println("3) Stored Messages Menu Options (Part 3)");
+System.out.println("4) Quit");
+System.out.print("Selection: ");
+
+String choice = scanner.nextLine().trim();
+
+if (choice.equals("4")) {
+running = false;
+System.out.println("\nQuitting application safely...");
+} else if (choice.equals("1")) {
+sendMessagesWorkflow();
+} else if (choice.equals("2")) {
+showRecentlySentMessages();
+} else if (choice.equals("3")) {
+runStoredMessagesSubMenu();
+} else {
+System.out.println("\n[INPUT FAULT ERROR] Invalid selection. Choose 1, 2, 3, or 4.");
+}
+}
+}
+
+private static void runRegistrationWorkflow() {
+System.out.println("Welcome! ");
+System.out.println("System Sign Up");
+
+System.out.print("Enter First Name: ");
+String firstName = scanner.nextLine();
+
+System.out.print("Enter Last Name: ");
+String lastName = scanner.nextLine();
+
+System.out.print("Create account username: ");
+registeredUser = scanner.nextLine();
+
+System.out.print("Create account password: ");
+registeredPass = scanner.nextLine();
+
+System.out.println("[Successful Registration ] Welcome " + firstName + " " + lastName + "!");
+}
+
+private static boolean runLoginWorkflow() {
+System.out.println(" Account Authorization");
+
+System.out.print("Enter username: ");
+String userAttempt = scanner.nextLine();
+
+System.out.print("Enter password: ");
+String passAttempt = scanner.nextLine();
+
+return userAttempt.equals(registeredUser) && passAttempt.equals(registeredPass);
+}
+
+private static void sendMessagesWorkflow() {
+System.out.print("\nHow many total messages do you wish to enter? ");
+String numInput = scanner.nextLine();
+
+int numMessages;
+try {
+numMessages = Integer.parseInt(numInput.trim());
+} catch (NumberFormatException e) {
+System.out.println("\n[PARSING VALUE ERROR] Invalid integer parameter entered. Aborting pipeline.");
+return;
+}
+
+for (int i = 0; i < numMessages; i++) {
+System.out.println(String.format("\n--- Message Loop %d of %d ---", (i + 1), numMessages));
+
+// Recipient validation
+
+String recipient = "";
+while (true) {
+System.out.print("Enter recipient mobile number (international dialing codes): ");
+recipient = scanner.nextLine();
+
+if (recipient.trim().length() >= 10) {
+break;
+}
+System.out.println("[FORMAT DATA FAULT] Format verification failure. Full international digits required.");
+}
+
+//  Message Length Validation 
+String content = "";
+while (true) {
+System.out.print("Enter short descriptive message (Strict 250 character cap limit): ");
+content = scanner.nextLine();
+
+if (content.trim().isEmpty()) {
+System.out.println("[VALIDATION ERROR] Message text cannot be empty.");
+} else if (content.length() <= 250) {
+System.out.println("Message text verified.");
+break;
+} else {
+System.out.println("[TEXT FIELD SIZE VIOLATION] Please enter a message of less than 250 characters.");
+}
+}
+
+// Distinct 10-Digit Message ID Token
+Random rand = new Random();
+long idNum = (long) (rand.nextDouble() * 9000000000L) + 1000000000L;
+String messageID = String.valueOf(idNum);
+
+//  Generating the Token Hash
+String hash = generateHash(messageID, i, content);
+
+// choose any Processing Vector Options Direction
+int actionChoice = -1;
+while (actionChoice < 0 || actionChoice > 2) {
+System.out.println("\nDefine routing track code selection handling for this processing instance:");
+System.out.println("0) S (Send Message)");
+System.out.println("1) O (Disregard Message)");
+System.out.println("2) Store Message");
+System.out.print("Selection (0-2): ");
+
+try {
+actionChoice = Integer.parseInt(scanner.nextLine().trim());
+} catch (NumberFormatException e) {
+actionChoice = -1;
+}
+
+if (actionChoice < 0 || actionChoice > 2) {
+System.out.println("Invalid selection. Please enter 0, 1, or 2.");
+}
+}
+
+if (actionChoice == 0) {
+// Send Message
+Message messageInstance = new Message(messageID, hash, recipient, content, "Sent");
+masterMessageList.add(messageInstance);
+totalMessagesSent++;
+
+System.out.println("\n--- Processing Session Sent Details Confirmation Report Sequence");
+System.out.println("Message ID: " + messageID);
+System.out.println("Message Hash: " + hash);
+System.out.println("Recipient: " + recipient);
+System.out.println("Message: " + content);
+
+
+storeMessageToTextFile(messageID, recipient, content, hash);
+
+} else if (actionChoice == 1) {
+// Disregard Message
+Message messageInstance = new Message(messageID, hash, recipient, content, "Disregarded");
+masterMessageList.add(messageInstance);
+System.out.println("\n[DISCARDING QUEUE ROUTING VIEW] Message discarded safely.");
+
+storeMessageToTextFile(messageID, recipient, content, hash);
+
+} else if (actionChoice == 2) {
+// Store Message
+Message messageInstance = new Message(messageID, hash, recipient, content, "Stored");
+masterMessageList.add(messageInstance);
+System.out.println("\n[BUFFER MEMORY SYNCH CONFIRMATION] Message successfully stored in buffer memory.");
+
+storeMessageToTextFile(messageID, recipient, content, hash);
+}
+}
+
+System.out.println("\n=== SUMMARY REPORT ");
+System.out.println("Total messages processed/sent: " + totalMessagesSent);
+}
+
+private static String generateHash(String id, int loopCounter, String content) {
+String cleanID = id.substring(0, 2);
+String[] splitWords = content.trim().split("\\s+");
+
+String firstWord = splitWords.length > 0 ? splitWords[0] : "NULL";
+String lastWord = splitWords.length > 0 ? splitWords[splitWords.length - 1] : "NULL";
+
+String generatedRaw = cleanID + ":" + loopCounter + ":" + firstWord + lastWord;
+return generatedRaw.toUpperCase();
+}
+
+ //Required custom persistence function that writes transaction blocks sequentially to a text file.
+
+private static void storeMessageToTextFile(String id, String recipient, String message, String hash) {
+try (FileWriter file = new FileWriter("stored_message.txt", true)) {
+file.write("Message ID: " + id + "\n");
+file.write("Recipient: " + recipient + "\n");
+file.write("Message: " + message + "\n");
+file.write("Hash: " + hash + "\n");
+file.write("-----\n"); 
+System.out.println("Message stored successfully in text file.");
+} catch (IOException e) {
+System.out.println("[STORAGE ERROR] Unable to process writing streaming output data to text file.");
+e.printStackTrace();
+}
+}
+
+
+// stored messages(app extraction)
+
+
+private static void runStoredMessagesSubMenu() {
+// Populating required parallel standard arrays tracking targets directly from the dynamic runtime state
+String[] sentMessagesArray = getFilteredArrayByStatus("Sent");
+String[] disregardedMessagesArray = getFilteredArrayByStatus("Disregarded");
+String[] storedMessagesArray = getFilteredArrayByStatus("Stored");
+
+String[] messageHashArray = new String[masterMessageList.size()];
+String[] messageIdArray = new String[masterMessageList.size()];
+
+for (int index = 0; index < masterMessageList.size(); index++) {
+messageHashArray[index] = masterMessageList.get(index).messageHash;
+messageIdArray[index] = masterMessageList.get(index).messageID;
+}
+
+System.out.println("\n--- Part 3: Stored Messages Menu Features ---");
+System.out.println("a) Display details (Sender & Recipient) of all stored messages");
+System.out.println("b) Display the longest stored message description");
+System.out.println("c) Search for a message by unique Message ID");
+System.out.println("d) Search all messages for a particular Recipient");
+System.out.println("e) Delete a message using its unique Message Hash");
+System.out.println("f) Display absolute report summary of all tracked records");
+System.out.print("Selection (a-f): ");
+String subChoice = scanner.nextLine().trim().toLowerCase();
+
+switch (subChoice) {
+case "a":
+System.out.println("\n=== Sender & Recipient Reference Matrix ===");
+boolean trackingStoredFound = false;
+for (Message msg : masterMessageList) {
+if (msg.status.equals("Stored")) {
+System.out.println("Sender Account: " + registeredUser + " ---> Recipient Target: " + msg.recipient);
+trackingStoredFound = true;
+}
+}
+if (!trackingStoredFound) {
+System.out.println("No matching context records currently found marked as 'Stored'.");
+}
+break;
+
+case "b":
+System.out.println("\n=== Longest Stored Message Evaluation ===");
+String maxDescriptionLengthText = "";
+for (String textElement : storedMessagesArray) {
+if (textElement.length() > maxDescriptionLengthText.length()) {
+maxDescriptionLengthText = textElement;
+}
+}
+if (!maxDescriptionLengthText.isEmpty()) {
+System.out.println("Longest Recorded String: \"" + maxDescriptionLengthText + "\"");
+} else {
+System.out.println("No data entry elements exist within the stored messages tracking buffer.");
+}
+break;
+
+case "c":
+System.out.print("\nEnter target 10-digit Message ID to lookup: ");
+String queryId = scanner.nextLine().trim();
+boolean matchingIdDiscovered = false;
+
+for (int idx = 0; idx < messageIdArray.length; idx++) {
+if (messageIdArray[idx].equals(queryId)) {
+Message target = masterMessageList.get(idx);
+System.out.printf("Match Discovered! [To]: %s | [Payload]: \"%s\" (%s)%n",
+target.recipient, target.content, target.status);
+matchingIdDiscovered = true;
+break;
+}
+}
+if (!matchingIdDiscovered) {
+System.out.println("No structural tracking record matches that specific ID context index.");
+}
+break;
+
+case "d":
+System.out.print("\nEnter recipient target phone number criteria: ");
+String queryRecipient = scanner.nextLine().trim();
+boolean matchRecipFound = false;
+
+System.out.println("\n--- Historical Communication Matches ---");
+for (Message msg : masterMessageList) {
+if (msg.recipient.equals(queryRecipient)) {
+System.out.printf("- status: [%s] | Text: \"%s\" (Hash: %s)%n",
+msg.status, msg.content, msg.messageHash);
+matchRecipFound = true;
+}
+}
+if (!matchRecipFound) {
+System.out.println("No interaction history traces exist corresponding to that recipient target.");
+}
+break;
+
+case "e":
+System.out.print("\nEnter absolute complete Message Hash code to perform deletion sequence: ");
+String queryHash = scanner.nextLine().trim().toUpperCase();
+int extractionIndex = -1;
+
+for (int idx = 0; idx < messageHashArray.length; idx++) {
+if (messageHashArray[idx].equals(queryHash)) {
+extractionIndex = idx;
+break;
+}
+}
+
+if (extractionIndex != -1) {
+Message removedRecord = masterMessageList.remove(extractionIndex);
+System.out.printf("Message: \"%s\" successfully deleted from active application tracks.%n", removedRecord.content);
+} else {
+System.out.println("Target message structural tracking record hash key index missing.");
+}
+break;
+
+case "f":
+System.out.println("\n=== SYSTEM BROAD-SPECTRUM ARCHIVE DISCOVERY REPORT ===");
+if (masterMessageList.isEmpty()) {
+System.out.println("No messages currently captured in running runtime collections.");
+} else {
+for (Message msg : masterMessageList) {
+System.out.printf("Hash ID: %s | Recipient Code: %s | Active Routing State: [%s]%nPayload Content: %s%n%n",
+msg.messageHash, msg.recipient, msg.status, msg.content);
+}
+}
+break;
+
+default:
+System.out.println("[ROUTING FAULT] Invalid menu letter instruction argument parsed.");
+break;
+}
+}
+
+
+ //abstracting matching string blocks into independent categorical string arrays.
+
+private static String[] getFilteredArrayByStatus(String stateCriteria) {
+ArrayList<String> matchesCollection = new ArrayList<>();
+for (Message msg : masterMessageList) {
+if (msg.status.equalsIgnoreCase(stateCriteria)) {
+matchesCollection.add(msg.content);
+}
+}
+return matchesCollection.toArray(new String[0]);
+}
+
+private static void showRecentlySentMessages() {
+boolean entriesTracked = false;
+System.out.println("\n=== Recently Handled Messages Log ===");
+for (int idx = 0; idx < masterMessageList.size(); idx++) {
+Message msg = masterMessageList.get(idx);
+if (msg.status.equals("Sent")) {
+System.out.printf("[%d] ID: %s%n Hash: %s%n To: %s%n Text: %s%n%n",
+(idx + 1), msg.messageID, msg.messageHash, msg.recipient, msg.content);
+entriesTracked = true;
+}
+}
+if (!entriesTracked) {
+System.out.println("\n[BUFFER STATUS EMPTY] No messages are currently flagged as sent inside memory state tracks.");
+}
+}
+}
