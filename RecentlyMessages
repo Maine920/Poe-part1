@@ -1,0 +1,16 @@
+private static void showRecentlySentMessages() {
+boolean entriesTracked = false;
+System.out.println("\n=== Recently Handled Messages Log ===");
+for (int idx = 0; idx < masterMessageList.size(); idx++) {
+Message msg = masterMessageList.get(idx);
+if (msg.status.equals("Sent")) {
+System.out.printf("[%d] ID: %s%n Hash: %s%n To: %s%n Text: %s%n%n",
+(idx + 1), msg.messageID, msg.messageHash, msg.recipient, msg.content);
+entriesTracked = true;
+}
+}
+if (!entriesTracked) {
+System.out.println("\n[BUFFER STATUS EMPTY] No messages are currently flagged as sent inside memory state tracks.");
+}
+}
+}
